@@ -65,14 +65,28 @@ namespace RealEstateWeb.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                // PasswordSignInAsync tự động kiểm tra hash mật khẩu trong DB
+                // Kiểm tra đăng nhập
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+
                 if (result.Succeeded)
                 {
+                    // 1. Tìm tài khoản vừa đăng nhập thành công
+                    var user = await _userManager.FindByEmailAsync(model.Email);
+
+                    // Ưu tiên 1: Nếu có link cũ đang xem dở (returnUrl) thì trả về link đó
                     if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                    {
                         return Redirect(returnUrl);
-                    else
-                        return RedirectToAction("Index", "Home");
+                    }
+
+                    // Ưu tiên 2: Kiểm tra nếu là Admin thì đẩy thẳng vào trang Quản trị (Dashboard)
+                    if (user != null && await _userManager.IsInRoleAsync(user, "Administrator"))
+                    {
+                        return RedirectToAction("Index", "Home", new { area = "Admin" });
+                    }
+
+                    // Ưu tiên 3: Nếu là user bình thường thì về Trang chủ
+                    return RedirectToAction("Index", "Home");
                 }
                 else
                 {

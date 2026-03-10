@@ -1,0 +1,62 @@
+﻿@model RealEstateWeb.Models.Contact
+
+@{
+    ViewData["Title"] = "Chi tiết Liên hệ";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+    <h2 class="fw-bold text-primary">Chi tiết Lời nhắn</h2>
+    <a asp-action="Index" class="btn btn-secondary shadow-sm">⬅ Quay lại danh sách</a>
+</div>
+
+<div class="card shadow-sm border-0 rounded-4 max-w-75">
+    <div class="card-header bg-info text-white rounded-top-4">
+        <h5 class="mb-0 py-2"><i class="bi bi-envelope-paper-fill"></i> Thông tin khách hàng để lại</h5>
+    </div>
+    <div class="card-body p-4">
+        <div class="row mb-3">
+            <div class="col-md-3 fw-bold text-secondary">Khách hàng:</div>
+            <div class="col-md-9 fs-5 text-dark fw-bold">@Model.FullName</div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-3 fw-bold text-secondary">Số điện thoại:</div>
+            <div class="col-md-9 text-danger fw-bold fs-5">@Model.PhoneNumber</div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-3 fw-bold text-secondary">Ngày gửi:</div>
+            <div class="col-md-9">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")</div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-3 fw-bold text-secondary">BĐS Quan tâm:</div>
+            <div class="col-md-9">
+                @if (Model.Property != null)
+                {
+                    <a href="/Home/Details/@Model.PropertyId" target="_blank" class="fw-bold text-decoration-none">
+                        @Model.Property.Title <i class="bi bi-box-arrow-up-right small"></i>
+                    </a>
+                }
+                else
+                {
+                    <span class="text-muted">Không xác định</span>
+                }
+            </div>
+        </div>
+
+        <hr />
+
+        <hr class="my-4" />
+
+        <div class="form-group mb-4">
+            <label class="form-label fw-bold text-secondary fs-5 mb-3">Nội dung Lời nhắn:</label>
+            <textarea class="form-control bg-white text-dark shadow-sm" rows="6" readonly style="resize: none;">@(string.IsNullOrEmpty(Model.Message) ? "Khách hàng không để lại lời nhắn nào." : Model.Message)</textarea>
+        </div>
+    </div>
+    <div class="card-footer bg-white border-0 pb-4 text-end">
+        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa liên hệ này?');">
+            <button type="submit" class="btn btn-danger px-4 shadow-sm">Xóa liên hệ này</button>
+        </form>
+    </div>
+</div>

@@ -41,5 +41,19 @@ namespace RealEstateWeb.Areas.Admin.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
+        // GET: Admin/Contact/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            // Lấy thông tin chi tiết của 1 liên hệ, bao gồm cả BĐS họ quan tâm
+            var contact = await _context.Contacts
+                .Include(c => c.Property)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (contact == null) return NotFound();
+
+            return View(contact);
+        }
     }
 }
