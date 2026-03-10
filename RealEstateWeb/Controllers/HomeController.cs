@@ -4,16 +4,20 @@ using Microsoft.EntityFrameworkCore;
 using RealEstateWeb.Data;
 using RealEstateWeb.Models;
 using System.Diagnostics;
+using Microsoft.AspNetCore.SignalR;
+using RealEstateWeb.Hubs;
 
 namespace RealEstateWeb.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public HomeController(ApplicationDbContext context)
+        public HomeController(ApplicationDbContext context, IHubContext<NotificationHub> hubContext)
         {
             _context = context;
+            _hubContext = hubContext;
         }
 
         public async Task<IActionResult> Index(string? searchTerm, int? categoryId, decimal? minPrice, decimal? maxPrice)
@@ -84,6 +88,10 @@ namespace RealEstateWeb.Controllers
                 _context.Contacts.Add(contact);
                 await _context.SaveChangesAsync();
 
+                // ===== BỔ SUNG DÒNG NÀY ĐỂ BÁO CHO ADMIN =====
+                await _hubContext.Clients.All.SendAsync("ReceiveNotification", $"📞 Có liên hệ mới từ: {contact.FullName} ({contact.PhoneNumber})");
+                // ==============================================
+
                 TempData["SuccessMessage"] = "Gửi thông tin thành công! Chúng tôi sẽ liên hệ lại với bạn sớm nhất.";
             }
             else
@@ -91,8 +99,12 @@ namespace RealEstateWeb.Controllers
                 TempData["ErrorMessage"] = "Vui lòng điền đầy đủ họ tên và số điện thoại.";
             }
 
-            // Quay lại đúng trang chi tiết của căn nhà đó
             return RedirectToAction("Details", new { id = contact.PropertyId });
+
+        }
+        public IActionResult Privacy()
+        {
+            return View();
         }
     }
 }
