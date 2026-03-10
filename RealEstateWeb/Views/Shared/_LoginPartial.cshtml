@@ -1,0 +1,46 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using RealEstateWeb.Models
+
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+
+@{
+    // Lấy thông tin user hiện tại từ Database để đọc AvatarUrl và FullName
+    AppUser? currentUser = null;
+    if (SignInManager.IsSignedIn(User))
+    {
+        currentUser = await UserManager.GetUserAsync(User);
+    }
+}
+
+<ul class="navbar-nav">
+    @if (SignInManager.IsSignedIn(User) && currentUser != null)
+    {
+        // Cấu hình hiển thị ảnh (Dùng ảnh thật hoặc ảnh tự tạo từ tên)
+        var avatarUrl = !string.IsNullOrEmpty(currentUser.AvatarUrl)
+        ? currentUser.AvatarUrl
+        : $"https://ui-avatars.com/api/?name={currentUser.FullName}&background=random&size=40";
+
+        <li class="nav-item d-flex align-items-center me-3">
+            <img src="@avatarUrl" alt="Avatar" class="rounded-circle border border-primary object-fit-cover shadow-sm" style="width: 35px; height: 35px; margin-right: 8px;" />
+
+            <a class="nav-link text-primary fw-bold p-0" asp-controller="Profile" asp-action="Index" title="Quản lý tài khoản">
+                @currentUser.FullName
+            </a>
+        </li>
+        <li class="nav-item d-flex align-items-center">
+            <form class="form-inline m-0" asp-controller="Account" asp-action="Logout" method="post">
+                <button type="submit" class="nav-link btn btn-link text-danger border-0 p-0 fw-bold">Đăng xuất</button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark fw-bold" asp-controller="Account" asp-action="Register">Đăng ký</a>
+        </li>
+        <li class="nav-item ms-2">
+            <a class="nav-link btn btn-primary text-white px-4" asp-controller="Account" asp-action="Login">Đăng nhập</a>
+        </li>
+    }
+</ul>

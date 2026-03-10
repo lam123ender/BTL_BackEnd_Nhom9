@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Admin Panel</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body>
+    <div class="d-flex">
+        <div class="bg-dark text-white p-3 vh-100" style="width: 250px;">
+            <h4>Admin Panel</h4>
+            <hr />
+            <ul class="nav flex-column">
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-white fw-bold" href="/Admin/Home">📊 Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/Admin/Category">📑 Quản lý Danh mục</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/Admin/Property">🏠 Quản lý Bất động sản</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/Admin/Contact">📞 Quản lý Liên hệ</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="flex-grow-1 p-4">
+            @RenderBody()
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055">
+        <div id="liveToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="toastMessage">
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+    <script>
+        // Khởi tạo kết nối tới Hub
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/notificationHub")
+            .build();
+
+        // Lắng nghe tin nhắn có tên "ReceiveNotification" từ Server
+        connection.on("ReceiveNotification", function (message) {
+            // Đưa nội dung vào Toast
+            document.getElementById("toastMessage").innerText = message;
+
+            // Kích hoạt hiển thị Toast của Bootstrap
+            const toastLiveExample = document.getElementById('liveToast');
+            const toast = new bootstrap.Toast(toastLiveExample);
+            toast.show();
+        });
+
+        // Bắt đầu kết nối
+        connection.start().catch(function (err) {
+            return console.error(err.toString());
+        });
+    </script>
+</body>
+</html>

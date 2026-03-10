@@ -1,0 +1,55 @@
+﻿@model IEnumerable<RealEstateWeb.Models.Contact>
+
+@{
+    ViewData["Title"] = "Quản lý Liên hệ";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+    <h2 class="fw-bold text-primary">Danh sách Khách hàng Liên hệ</h2>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success shadow-sm">@TempData["SuccessMessage"]</div>
+}
+
+<div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body p-0 table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th class="ps-4">Khách hàng</th>
+                    <th>Số điện thoại</th>
+                    <th>Lời nhắn</th>
+                    <th>BĐS Quan tâm</th>
+                    <th>Ngày gửi</th>
+                    <th class="text-end pe-4">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="ps-4 fw-bold">@item.FullName</td>
+                        <td class="text-danger fw-bold">@item.PhoneNumber</td>
+                        <td><span class="d-inline-block text-truncate" style="max-width: 200px;">@item.Message</span></td>
+                        <td>
+                            @if (item.Property != null)
+                            {
+                                <a href="/Home/Details/@item.PropertyId" target="_blank" class="text-decoration-none">
+                                    <span class="d-inline-block text-truncate" style="max-width: 150px;">@item.Property.Title</span>
+                                </a>
+                            }
+                        </td>
+                        <td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td class="text-end pe-4">
+                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa liên hệ này?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

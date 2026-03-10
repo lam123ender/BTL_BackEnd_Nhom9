@@ -1,0 +1,117 @@
+﻿@{
+    ViewData["Title"] = "Dashboard Tổng quan";
+}
+
+<div class="container-fluid mt-4">
+    <h2 class="mb-4 fw-bold text-dark">Tổng quan Hệ thống</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary shadow-sm border-0 rounded-4">
+                <div class="card-body d-flex justify-content-between align-items-center p-4">
+                    <div>
+                        <h6 class="card-title text-uppercase fw-bold mb-2">Tổng Bất động sản</h6>
+                        <h2 class="mb-0 fw-bold">@ViewBag.TotalProperties</h2>
+                    </div>
+                    <div class="fs-1 opacity-50">🏠</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success shadow-sm border-0 rounded-4">
+                <div class="card-body d-flex justify-content-between align-items-center p-4">
+                    <div>
+                        <h6 class="card-title text-uppercase fw-bold mb-2">Tổng Danh mục</h6>
+                        <h2 class="mb-0 fw-bold">@ViewBag.TotalCategories</h2>
+                    </div>
+                    <div class="fs-1 opacity-50">📑</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-warning shadow-sm border-0 rounded-4">
+                <div class="card-body d-flex justify-content-between align-items-center p-4">
+                    <div>
+                        <h6 class="card-title text-uppercase fw-bold mb-2 text-dark">Tổng Người dùng</h6>
+                        <h2 class="mb-0 fw-bold text-dark">@ViewBag.TotalUsers</h2>
+                    </div>
+                    <div class="fs-1 opacity-50 text-dark">👥</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                    <h5 class="fw-bold text-secondary">Thống kê Bất động sản theo Danh mục</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="propertyChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 rounded-4 h-100 bg-light d-flex align-items-center justify-content-center">
+                <p class="text-muted">Không gian cho các Widget khác</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Lấy mảng dữ liệu C# từ ViewBag và chuyển thành JSON cho Javascript
+        const labels = @Html.Raw(Json.Serialize(ViewBag.ChartLabels));
+        const dataValues = @Html.Raw(Json.Serialize(ViewBag.ChartData));
+
+        const ctx = document.getElementById('propertyChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'bar', // Đổi thành 'pie' nếu bạn muốn biểu đồ tròn, 'line' cho biểu đồ đường
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Số lượng Bất động sản',
+                    data: dataValues,
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(153, 102, 255, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 5 // Bo góc các cột cho đẹp
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1 // Chỉ hiển thị số nguyên trên trục Y
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false // Ẩn chú thích (Legend) phía trên cùng vì chỉ có 1 dải dữ liệu
+                    }
+                }
+            }
+        });
+    </script>
+}

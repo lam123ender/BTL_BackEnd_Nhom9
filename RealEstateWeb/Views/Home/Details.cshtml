@@ -1,0 +1,117 @@
+﻿@model RealEstateWeb.Models.Property
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="container mt-5 pb-5">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm mt-3" role="alert">
+            ✅ @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Trang chủ</a></li>
+            <li class="breadcrumb-item active">@Model.Category?.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row mt-4">
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "https://via.placeholder.com/800x600?text=No+Image" : Model.ImageUrl)"
+                     class="img-fluid w-100" alt="@Model.Title" style="max-height: 500px; object-fit: cover;">
+            </div>
+
+            <div class="mt-4 p-4 bg-white rounded-4 shadow-sm">
+                <h4 class="fw-bold border-bottom pb-2">Mô tả chi tiết</h4>
+                <p class="text-secondary" style="line-height: 1.8; white-space: pre-line;">
+                    @Model.Description
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card shadow border-0 rounded-4 p-4 sticky-top" style="top: 20px;">
+                <span class="badge bg-success mb-2 w-25">@Model.Category?.Name</span>
+                <h2 class="fw-bold text-dark">@Model.Title</h2>
+                <p class="text-muted">📍 @Model.Address</p>
+
+                <hr>
+
+                <div class="row text-center my-3">
+                    <div class="col-6 border-end">
+                        <small class="text-muted d-block">Giá thuê/bán</small>
+                        <h4 class="text-danger fw-bold">@Model.Price.ToString("N0") VNĐ</h4>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">Diện tích</small>
+                        <h4 class="text-dark fw-bold">@Model.Area m²</h4>
+                    </div>
+                </div>
+
+                <div class="bg-light p-3 rounded-3 mb-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                            <i class="bi bi-person-fill fs-4">👤</i>
+                        </div>
+                        <div class="ms-3">
+                            <small class="text-muted d-block">Người đăng tin</small>
+                            <strong class="fs-5">@Model.User?.FullName</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-primary btn-lg w-100 fw-bold mb-3 shadow" data-bs-toggle="modal" data-bs-target="#contactModal">
+                    📞 Liên hệ ngay để xem nhà
+                </button>
+                <div class="mt-4 text-center">
+                    <small class="text-muted italic">Ngày đăng: @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white rounded-top-4">
+                <h5 class="modal-title fw-bold" id="contactModalLabel">Để lại thông tin tư vấn</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form asp-controller="Home" asp-action="SubmitContact" method="post">
+                <div class="modal-body p-4">
+                    <input type="hidden" name="PropertyId" value="@Model.Id" />
+
+                    <div class="alert alert-info py-2 small">
+                        Bạn đang quan tâm đến: <strong>@Model.Title</strong>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary">Họ và tên <span class="text-danger">*</span></label>
+                        <input type="text" name="FullName" class="form-control" required placeholder="Nhập tên của bạn..." />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary">Số điện thoại <span class="text-danger">*</span></label>
+                        <input type="tel" name="PhoneNumber" class="form-control" required placeholder="Nhập số điện thoại..." />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary">Lời nhắn (Tùy chọn)</label>
+                        <textarea name="Message" class="form-control" rows="3" placeholder="Tôi muốn xem căn nhà này vào cuối tuần..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light rounded-bottom-4">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="submit" class="btn btn-success fw-bold px-4">Gửi Yêu Cầu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

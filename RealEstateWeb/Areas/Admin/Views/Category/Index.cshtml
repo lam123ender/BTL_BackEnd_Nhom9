@@ -1,0 +1,36 @@
+﻿@model IEnumerable<RealEstateWeb.Models.Category>
+
+@{
+    ViewData["Title"] = "Danh sách Danh mục";
+}
+
+<h2>Quản lý Danh mục</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Tạo mới Danh mục</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Tên danh mục</th>
+            <th>Mô tả</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+                <td>@item.Description</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Sửa</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Xóa</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,27 @@
+﻿@model RealEstateWeb.Models.Category
+
+@{
+    ViewData["Title"] = "Xóa Danh mục";
+}
+
+<h2>Xóa Danh mục</h2>
+<h4 class="text-danger">Bạn có chắc chắn muốn xóa danh mục này không?</h4>
+<hr />
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">ID</dt>
+        <dd class="col-sm-10">@Model.Id</dd>
+
+        <dt class="col-sm-2">Tên danh mục</dt>
+        <dd class="col-sm-10">@Model.Name</dd>
+
+        <dt class="col-sm-2">Mô tả</dt>
+        <dd class="col-sm-10">@Model.Description</dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Xác nhận Xóa" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Hủy bỏ</a>
+    </form>
+</div>

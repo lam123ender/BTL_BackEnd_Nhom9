@@ -1,0 +1,30 @@
+﻿@model RealEstateWeb.Models.Property
+
+@{
+    ViewData["Title"] = "Xóa Bất động sản";
+}
+
+<h2>Xóa Bất động sản</h2>
+<h4 class="text-danger">Bạn có chắc chắn muốn xóa tin đăng này không?</h4>
+<hr />
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">Tiêu đề</dt>
+        <dd class="col-sm-10">@Model.Title</dd>
+
+        <dt class="col-sm-2">Danh mục</dt>
+        <dd class="col-sm-10">@Model.Category.Name</dd>
+
+        <dt class="col-sm-2">Giá</dt>
+        <dd class="col-sm-10">@Model.Price.ToString("N0") VNĐ</dd>
+
+        <dt class="col-sm-2">Người đăng</dt>
+        <dd class="col-sm-10">@Model.User.UserName</dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Xác nhận Xóa" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Hủy bỏ</a>
+    </form>
+</div>
