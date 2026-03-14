@@ -20,8 +20,11 @@ namespace RealEstateWeb.Controllers
             _hubContext = hubContext;
         }
 
-        public async Task<IActionResult> Index(string? searchTerm, int? categoryId, decimal? minPrice, decimal? maxPrice)
+        // Bổ sung tham số int page = 1 vào đây
+        public async Task<IActionResult> Index(string? searchTerm, int? categoryId, decimal? minPrice, decimal? maxPrice, int page = 1)
         {
+            int pageSize = 6; // Số lượng BĐS trên 1 trang
+
             // 1. Khởi tạo query cơ bản
             var query = _context.Properties
                 .Include(p => p.Category)
@@ -49,17 +52,31 @@ namespace RealEstateWeb.Controllers
                 query = query.Where(p => p.Price <= maxPrice.Value);
             }
 
+            // --- LOGIC PHÂN TRANG  ---
+            int totalItems = await query.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            // Sử dụng Skip và Take để cắt dữ liệu theo trang
+            var result = await query
+                .OrderByDescending(p => p.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
             // Gửi danh sách danh mục sang View để hiển thị trong Dropdown tìm kiếm
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", categoryId);
 
-            // Giữ lại các giá trị đã lọc để hiển thị trên Form
+            // Giữ lại các giá trị đã lọc và số trang để hiển thị trên View
             ViewData["CurrentSearch"] = searchTerm;
+            ViewData["CurrentCategory"] = categoryId;
             ViewData["CurrentMinPrice"] = minPrice;
             ViewData["CurrentMaxPrice"] = maxPrice;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
 
-            var result = await query.OrderByDescending(p => p.CreatedAt).ToListAsync();
             return View(result);
         }
+
         // GET: /Home/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -78,6 +95,7 @@ namespace RealEstateWeb.Controllers
 
             return View(property);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitContact(Contact contact)
@@ -88,7 +106,7 @@ namespace RealEstateWeb.Controllers
                 _context.Contacts.Add(contact);
                 await _context.SaveChangesAsync();
 
-                // ===== BỔ SUNG DÒNG NÀY ĐỂ BÁO CHO ADMIN =====
+                // ===== BÁO CÁO CHO ADMIN QUA SIGNALR =====
                 await _hubContext.Clients.All.SendAsync("ReceiveNotification", $"📞 Có liên hệ mới từ: {contact.FullName} ({contact.PhoneNumber})");
                 // ==============================================
 
@@ -100,8 +118,8 @@ namespace RealEstateWeb.Controllers
             }
 
             return RedirectToAction("Details", new { id = contact.PropertyId });
-
         }
+
         public IActionResult Privacy()
         {
             return View();
